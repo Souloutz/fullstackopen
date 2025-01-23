@@ -12,17 +12,34 @@ const App = () => {
     'Programming without an extremely heavy use of console.log is same as if a doctor would refuse to use x-rays or blood tests when diagnosing patients.',
     'The only way to go fast, is to go well.'
   ];
-   
-  const [selected, setSelected] = useState(0);
 
+  const record: Record<number, number> = anecdotes.reduce((obj: Record<number, number>, _, index: number) => {
+    obj[index] = 0;
+    return obj;
+  }, {});
+
+  const [selected, setSelected] = useState(0);
+  const [votes, setVotes] = useState(record);
+   
   const getRandomIndex = (): number => {
     return Math.floor(Math.random() * anecdotes.length);
+  };
+
+  const handleVote = (): void => {
+    const copy = {...votes};
+    copy[selected] += 1;
+
+    setVotes(copy);
   };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 7, alignItems: 'center' }}>
       {anecdotes[selected]}
-      <button style={{ width: 'fit-content' }}onClick={() => setSelected(getRandomIndex())}>Next Anecdote</button>
+      <p>Has {votes[selected]} votes</p>
+      <div style={{ display: 'flex', flexDirection: 'row', gap: 5 }}>
+        <button style={{ width: 'fit-content' }} onClick={() => handleVote()}>Vote</button>
+        <button style={{ width: 'fit-content' }} onClick={() => setSelected(getRandomIndex())}>Next Anecdote</button>
+      </div>
     </div>
   );
 }
