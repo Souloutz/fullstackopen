@@ -6,7 +6,9 @@ type Props = {
 const StatisticLine: React.FC<Props> = ({ text, value }) => {
     return (
         <>
-            <p>{text}: {value}</p> {/* {isNaN(value) ? '-%' : value * 100} */}
+            <tr>
+                <td>{text}: {value}</td>
+            </tr>
         </>
     );
 }
