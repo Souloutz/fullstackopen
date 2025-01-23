@@ -20,6 +20,7 @@ const App = () => {
 
   const [selected, setSelected] = useState(0);
   const [votes, setVotes] = useState(record);
+  const [maxIndex, setMaxIndex] = useState(0);
    
   const getRandomIndex = (): number => {
     return Math.floor(Math.random() * anecdotes.length);
@@ -28,18 +29,29 @@ const App = () => {
   const handleVote = (): void => {
     const copy = {...votes};
     copy[selected] += 1;
-
     setVotes(copy);
+
+    let index = maxIndex;
+    for (const key in Object.keys(copy)) {
+      if (copy[key] > copy[index])
+        index = Number.parseInt(key)
+    }
+
+    setMaxIndex(index);
   };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 7, alignItems: 'center' }}>
+      <h1>Anecdote</h1>
       {anecdotes[selected]}
       <p>Has {votes[selected]} votes</p>
       <div style={{ display: 'flex', flexDirection: 'row', gap: 5 }}>
         <button style={{ width: 'fit-content' }} onClick={() => handleVote()}>Vote</button>
         <button style={{ width: 'fit-content' }} onClick={() => setSelected(getRandomIndex())}>Next Anecdote</button>
       </div>
+      <h1>Most Voted</h1>
+      {anecdotes[maxIndex]}
+      <p>Has {votes[maxIndex]} votes</p>
     </div>
   );
 }
