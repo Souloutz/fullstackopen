@@ -4,15 +4,15 @@ import Button from './components/Button'
 import Statistics from './components/Statistics'
 
 const App = () => {
-  const [good, setGood] = useState(0)
-  const [neutral, setNeutral] = useState(0)
-  const [bad, setBad] = useState(0)
-  const [total, setTotal] = useState(0)
+  const [good, setGood] = useState(0);
+  const [neutral, setNeutral] = useState(0);
+  const [bad, setBad] = useState(0);
+  const [total, setTotal] = useState(0);
 
   const handleClick = (setFunction: Function, value: number) => {
     setFunction(value + 1)
     setTotal(total + 1)
-  }
+  };
 
   return (
     <div>
