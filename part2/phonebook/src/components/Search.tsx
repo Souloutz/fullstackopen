@@ -1,11 +1,17 @@
 type Props = {
+    setSearch: React.Dispatch<React.SetStateAction<string>>;
     handleSearch: (value: string) => void;
 }
 
-const Search: React.FC<Props> = ({ handleSearch }) => {
+const Search: React.FC<Props> = ({ setSearch, handleSearch }) => {
     return (
         <div>
-            Search Filter: <input onChange={e => handleSearch(e.target.value)} />
+            Search Filter: 
+            <input onChange={e => {
+                const newSearch = e.target.value;
+                setSearch(newSearch);
+                handleSearch(newSearch);
+            }} />
         </div>
     );
 }
