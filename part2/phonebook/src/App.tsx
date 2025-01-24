@@ -22,7 +22,7 @@ const App = () => {
   const [newName, setNewName] = useState('');
   const [newNumber, setNewNumber] = useState('');
   const [search, setSearch] = useState('');
-  const [shownPersons, setShownPersons] = useState<Person[]>(setData);
+  const [showAll, setShowAll] = useState(true);
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>): void => {
     e.preventDefault(); // prevent default GET and reloading of page
@@ -37,44 +37,30 @@ const App = () => {
     if (newName.length > 0 && newNumber.length > 0) {
       const updatedPersons = [...persons].concat(newPerson);
       setPersons(updatedPersons);
-      handleSearch(search);
-      console.log(`New person added and search is:`, search, `with shownPersons:`, shownPersons, `& persons:`, persons);
+      setNewName('');
+      setNewNumber('');
+      console.log(`New person added and search is:`, search, `showAll:`, showAll, `& persons:`, persons);
     }
   };
 
-  const handleSearch = (value: string): void => {
-    if (value.length === 0) {
-      setShownPersons(persons)
-      return
-    }
-
-    const shownPersons = [];
-    for (const person of persons) {
-      if (person.name.toLowerCase().includes(value.toLowerCase())) 
-        shownPersons.push(person);
-    }
-
-    setShownPersons(shownPersons);
-    console.log(shownPersons);
-  };
+  const personsToShow = showAll ? persons : persons.filter(person => person.name.toLowerCase().includes(search.toLowerCase()))
 
   return (
     <div style={{ display: 'flex', gap: '25%' }}>
       <div>
         <h2>Phonebook</h2>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '3rem'}}>
-          <Search setSearch={setSearch} handleSearch={handleSearch} />
+          <Search setSearch={setSearch} setShowAll={setShowAll} />
           <Form handleSubmit={handleSubmit} setNewName={setNewName} setNewNumber={setNewNumber} />
         </div>
       </div>
 
       <div style={{ width: '100%' }}>
         <h2>Numbers</h2>
-        {persons.length === 0 ? <p>No numbers saved</p> :
-        search.length === 0 ? 
-        persons.map(person => <PersonInfo key={person.number} person={person} />) :
-        shownPersons.map(shownPerson => <PersonInfo key={shownPerson.number} person={shownPerson}/>)}
-        {/* persons.map(person => <p key={person.number}>{person.name} - {person.number}</p>)} */}
+        {
+          persons.length === 0 ? <p>No numbers saved</p> :
+          personsToShow.map(person => <PersonInfo key={person.number} person={person} />)
+        }
       </div>
     </div>
   );
