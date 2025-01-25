@@ -4,7 +4,7 @@ import './index.css';
 import App from './App.tsx';
 
 export interface Note {
-  id: number;
+  id?: number;
   content: string;
   important: boolean;
 }
