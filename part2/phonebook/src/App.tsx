@@ -3,7 +3,7 @@ import './App.css';
 import Form from './components/Form';
 import Search from './components/Search';
 import PersonInfo from './components/Person';
-import personService, { Person } from './services/person';
+import personService, { NewPerson, Person } from './services/person';
 
 const App = () => {
   const [persons, setPersons] = useState<Person[]>([]);
@@ -24,7 +24,7 @@ const App = () => {
   const handleSubmit = (e: FormEvent<HTMLFormElement>): void => {
     e.preventDefault(); // prevent default GET and reloading of page
     
-    const newPerson: Person = {name: newName, number: newNumber};
+    const newPerson: NewPerson = {name: newName, number: newNumber};
     const exists = persons.some(person => person.name === newPerson.name && person.number === newPerson.number);
     console.log('Clicked!', 'Exists:', exists, 'New:', newPerson, 'Current:', persons);
     if (exists) {
@@ -43,6 +43,14 @@ const App = () => {
     }
   };
 
+  const handleDelete = (id: number) => {
+    personService.deletePerson(id)
+      .then(deletedPerson => {
+        const updatedPersons = [...persons].filter(person => person.id !== deletedPerson.id);
+        setPersons(updatedPersons);
+      });
+  };
+
   const personsToShow = showAll ? persons : persons.filter(person => person.name.toLowerCase().includes(search.toLowerCase()))
 
   return (
@@ -59,7 +67,7 @@ const App = () => {
         <h2>Numbers</h2>
         {
           persons.length === 0 ? <p>No numbers saved</p> :
-          personsToShow.map(person => <PersonInfo key={person.number} person={person} />)
+          personsToShow.map(person => <PersonInfo key={person.number} person={person} handleDelete={handleDelete} />)
         }
       </div>
     </div>
