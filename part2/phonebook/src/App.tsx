@@ -1,28 +1,30 @@
-import { FormEvent, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import './App.css';
 import Form from './components/Form';
 import Search from './components/Search';
 import PersonInfo from './components/Person';
+import axios from 'axios';
 
 export type Person = {
   name: string;
   number: string;
 }
 
-const setData: Person[] = [
-  { name: 'Howard Kong', number: '917-517-5963' },
-  { name: 'Arto Hellas', number: '040-123456' },
-  { name: 'Ada Lovelace', number: '39-44-5323523' },
-  { name: 'Dan Abramov', number: '12-43-234345' },
-  { name: 'Mary Poppendieck', number: '39-23-6423122' }
-];
-
 const App = () => {
-  const [persons, setPersons] = useState<Person[]>(setData);
+  const [persons, setPersons] = useState<Person[]>([]);
   const [newName, setNewName] = useState('');
   const [newNumber, setNewNumber] = useState('');
   const [search, setSearch] = useState('');
   const [showAll, setShowAll] = useState(true);
+
+  const fetchData = (): void => {
+    axios
+      .get('http://localhost:3001/persons')
+      .then(response => {
+          setPersons(response.data);
+      });
+  };
+  useEffect(fetchData, []);
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>): void => {
     e.preventDefault(); // prevent default GET and reloading of page
