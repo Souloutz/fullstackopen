@@ -6,7 +6,7 @@ type Props = {
 
 const NoteInfo: React.FC<Props> = ({ note }) => {
     return (
-        <li>{note.content}</li>
+        <li style={{ textAlign: 'left' }}>{note.content}</li>
     );
 };
 

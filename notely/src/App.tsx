@@ -1,16 +1,27 @@
-import React, { useState } from 'react';
-import './App.css'
+import React, { useEffect, useState } from 'react';
+import './App.css';
 import NoteInfo from './components/NoteInfo';
 import { Note } from './main';
+import axios from 'axios';
 
-type Props = {
-  notesData: Note[];
-}
-
-const App: React.FC<Props> = ({ notesData }) => {
-  const [notes, setNotes] = useState(notesData);
+const App = () => {
+  const [notes, setNotes] = useState<Note[]>([]);
   const [newNote, setNewNote] = useState('');
-  const [showAll, setShowAll] = useState(false);
+  const [showAll, setShowAll] = useState(true);
+
+  const getNotes = () => {
+    console.log('Effect')
+    axios
+      .get('http://localhost:3001/notes')
+      .then(response => {
+        console.log('Promise Fulfilled');
+        const notes: Note[] = response.data;
+        setNotes(notes);
+      });
+  }
+
+  useEffect(getNotes, [])
+  console.log('Render', notes.length, 'notes');
 
   const addNote = (event: React.ChangeEvent<HTMLFormElement>): void => {
     event.preventDefault();
@@ -45,9 +56,10 @@ const App: React.FC<Props> = ({ notesData }) => {
         )}
       </ul>
 
-      <form onSubmit={addNote}>
+      <form style={{ marginTop: '3rem' }} onSubmit={addNote}>
+        <label>Note: </label>
         <input value={newNote} onChange={handleNoteChange} />
-        <button type='submit'>Save</button>
+        <button style={{ marginLeft: '1rem' }}type='submit'>Save</button>
       </form>
     </div>
   );
