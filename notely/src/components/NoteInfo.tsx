@@ -1,4 +1,4 @@
-import { Note } from "../main";
+import { Note } from "../services/notes";
 
 type Props = {
     note: Note;
