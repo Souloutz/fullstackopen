@@ -43,8 +43,9 @@ const App = () => {
     }
   };
 
-  const handleDelete = (id: number) => {
-    personService.deletePerson(id)
+  const handleDelete = (person: Person) => {
+    if (window.confirm(`Warning! Do you want to delete '${person.name}' from your contacts?`))
+    personService.deletePerson(person.id)
       .then(deletedPerson => {
         const updatedPersons = [...persons].filter(person => person.id !== deletedPerson.id);
         setPersons(updatedPersons);
