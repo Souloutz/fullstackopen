@@ -2,11 +2,14 @@ import React, { useEffect, useState } from 'react';
 import './App.css';
 import NoteInfo from './components/NoteInfo';
 import noteService, { NewNote, Note } from './services/notes';
+import Notification from './components/Notification';
+import Footer from './components/Footer';
 
 const App = () => {
   const [notes, setNotes] = useState<Note[]>([]);
   const [newNote, setNewNote] = useState('');
   const [showAll, setShowAll] = useState(true);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const getNotes = () => {
     noteService.fetchNotes()
@@ -39,8 +42,11 @@ const App = () => {
         setNotes(notes.map(note => note.id === id ? returnedNote : note));
       })
       .catch(err => {
-        console.log(err);
-        alert(`The note '${note.content}' was already deleted from the server.`);
+        console.log(err)
+        setErrorMessage(`Note '${note.content} was already deleted from the server.'`);
+        setTimeout(() => {
+          setErrorMessage(null);
+        }, 5000);
         setNotes(notes.filter(note => note.id !== id));
       });
   };
@@ -55,6 +61,7 @@ const App = () => {
   return (
     <div>
       <h1>Notes</h1>
+      <Notification message={errorMessage} />
       <div>
         <button onClick={() => setShowAll(!showAll)}>
           Show {showAll ? 'Important' : 'All'}
@@ -72,6 +79,8 @@ const App = () => {
         <input value={newNote} onChange={handleNoteChange} />
         <button style={{ marginLeft: '1rem' }}type='submit'>Save</button>
       </form>
+
+      <Footer />
     </div>
   );
 };
