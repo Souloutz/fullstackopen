@@ -4,6 +4,7 @@ import Form from './components/Form';
 import Search from './components/Search';
 import PersonInfo from './components/Person';
 import personService, { NewPerson, Person } from './services/person';
+import Notification from './components/Notification';
 
 const App = () => {
   const [persons, setPersons] = useState<Person[]>([]);
@@ -11,6 +12,7 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('');
   const [search, setSearch] = useState('');
   const [showAll, setShowAll] = useState(true);
+  const [notification, setNotification] = useState<string | null>(null);
 
   // Helper Function for useEffect
   const fetchData = () => {
@@ -22,6 +24,14 @@ const App = () => {
   };
   useEffect(fetchData, []);
 
+  // Helper Function for Displaying Notification
+  const displayNotification = (message: string) => {
+    setNotification(message);
+    setTimeout(() => {
+      setNotification(null);
+    }, 5000);
+  };
+
   // Handler for Form Submittion
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault(); // prevent default GET and reloading of page
@@ -31,8 +41,6 @@ const App = () => {
     
     // console.log('Clicked!', 'New:', newPerson, 'Current:', persons);
     if (existingPerson !== undefined) {
-      // alert(`${newName} has already been added to the phonebook!`)
-      
       if (window.confirm(`'${existingPerson.name}' has already been added! Do you wish to replace the previous number?`)) {
         const updatedPerson = {...newPerson, id: existingPerson.id};
         personService.updatePerson(updatedPerson)
@@ -43,10 +51,17 @@ const App = () => {
             setPersons(updatedPersons);
             setNewName('');
             setNewNumber('');
+
+            displayNotification(`Successfully updated number for '${updatedPerson.name}'!`);
+          })
+          .catch(_ => {
+            displayNotification(`Error updating '${updatedPerson.name}'.`);
           });
+
         return;
       }
       
+      displayNotification(`'${existingPerson.name}' has already been added to the phonebook!`);
       return;
     }
 
@@ -57,6 +72,8 @@ const App = () => {
           setPersons(updatedPersons);
           setNewName('');
           setNewNumber('');
+
+          displayNotification(`Successfully added '${createdPerson.name}' to phonebook!`);
         });
     }
   };
@@ -68,29 +85,35 @@ const App = () => {
       .then(deletedPerson => {
         const updatedPersons = [...persons].filter(person => person.id !== deletedPerson.id);
         setPersons(updatedPersons);
+
+        displayNotification(`Successfully removed '${deletedPerson.name}' from the phonebook!`);
       });
   };
 
   const personsToShow = showAll ? persons : persons.filter(person => person.name.toLowerCase().includes(search.toLowerCase()))
 
   return (
-    <div style={{ display: 'flex', gap: '25%' }}>
-      <div>
-        <h2>Phonebook</h2>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '3rem'}}>
-          <Search setSearch={setSearch} setShowAll={setShowAll} />
-          <Form inputName={newName} inputNumber={newNumber} handleSubmit={handleSubmit} setNewName={setNewName} setNewNumber={setNewNumber} />
+    <>
+      <Notification message={notification} />
+      <div style={{ display: 'flex', gap: '25%' }}>
+        <div>
+          <h2>Phonebook</h2>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '3rem'}}>
+            <Search setSearch={setSearch} setShowAll={setShowAll} />
+            <Form inputName={newName} inputNumber={newNumber} handleSubmit={handleSubmit} setNewName={setNewName} setNewNumber={setNewNumber} />
+          </div>
+        </div>
+
+        <div style={{ width: '100%' }}>
+          <h2>Numbers</h2>
+          {
+            persons.length === 0 ? <p>No numbers saved</p> :
+            personsToShow.map(person => <PersonInfo key={person.number} person={person} handleDelete={handleDelete} />)
+          }
         </div>
       </div>
-
-      <div style={{ width: '100%' }}>
-        <h2>Numbers</h2>
-        {
-          persons.length === 0 ? <p>No numbers saved</p> :
-          personsToShow.map(person => <PersonInfo key={person.number} person={person} handleDelete={handleDelete} />)
-        }
-      </div>
-    </div>
+    </>
   );
 };
 
