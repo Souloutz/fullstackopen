@@ -1,4 +1,10 @@
-const http = require('http');
+const express = require('express');
+const dotenv = require('dotenv');
+
+dotenv.config();
+
+const app = express();
+const port = process.env.PORT;
 
 let notes = [
     {
@@ -23,11 +29,14 @@ let notes = [
     }
 ];
 
-const app = http.createServer((request, response) => {
-    response.writeHead(200, { 'Content-Type': 'application/json' });
-    response.end(JSON.stringify(notes));
+app.get('/', (req, res) => {
+    res.send('<h1>Hello World!</h1>');
 });
 
-const PORT = 3001;
-app.listen(PORT);
-console.log(`Server running on port ${PORT}`);
+app.get('/api/notes', (req, res) => {
+    res.json(notes);
+});
+
+app.listen(port, () => {
+    console.log(`Server running at 'http://localhost:${port}'`);
+});
