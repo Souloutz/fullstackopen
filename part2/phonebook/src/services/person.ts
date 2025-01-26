@@ -13,17 +13,22 @@ const baseURL = 'http://localhost:3001/persons';
 
 const fetchPersons = async(): Promise<Person[]> => {
     const response = axios.get(baseURL);
-    return (await response).data
-}
+    return (await response).data;
+};
 
 const createPerson = async(newPerson: NewPerson): Promise<Person> => {
     const response = axios.post(baseURL, newPerson);
     return (await response).data;
-}
+};
+
+const updatePerson = async(updatedPerson: Person): Promise<Person> => {
+    const response = axios.put(`${baseURL}/${updatedPerson.id}`, updatedPerson);
+    return (await response).data;
+};
 
 const deletePerson = async(id: number): Promise<Person> => {
     const response = axios.delete(`${baseURL}/${id}`);
     return (await response).data;
-}
+};
 
-export default { fetchPersons, createPerson, deletePerson };
+export default { fetchPersons, createPerson, updatePerson, deletePerson };

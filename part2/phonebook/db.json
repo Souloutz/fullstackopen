@@ -26,9 +26,9 @@
       "number": "39-23-6423122"
     },
     {
-      "id": "bca6",
       "name": "Jordan Allard",
-      "number": "123-456-7890"
+      "number": "123-456-7890",
+      "id": "bca6"
     }
   ]
 }

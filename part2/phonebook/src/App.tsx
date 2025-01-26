@@ -12,6 +12,7 @@ const App = () => {
   const [search, setSearch] = useState('');
   const [showAll, setShowAll] = useState(true);
 
+  // Helper Function for useEffect
   const fetchData = () => {
     personService.fetchPersons()
       .then(persons => {
@@ -21,15 +22,32 @@ const App = () => {
   };
   useEffect(fetchData, []);
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>): void => {
+  // Handler for Form Submittion
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault(); // prevent default GET and reloading of page
     
     const newPerson: NewPerson = {name: newName, number: newNumber};
-    const exists = persons.some(person => person.name === newPerson.name && person.number === newPerson.number);
-    console.log('Clicked!', 'Exists:', exists, 'New:', newPerson, 'Current:', persons);
-    if (exists) {
-      alert(`${newName} has already been added to the phonebook!`)
-      return
+    const existingPerson: Person | undefined = persons.find(person => person.name === newPerson.name);
+    
+    // console.log('Clicked!', 'New:', newPerson, 'Current:', persons);
+    if (existingPerson !== undefined) {
+      // alert(`${newName} has already been added to the phonebook!`)
+      
+      if (window.confirm(`'${existingPerson.name}' has already been added! Do you wish to replace the previous number?`)) {
+        const updatedPerson = {...newPerson, id: existingPerson.id};
+        personService.updatePerson(updatedPerson)
+          .then(updatedPerson => {
+
+            // Replace updated person in copied state array
+            const updatedPersons = [...persons].map(person => person.id === updatedPerson.id ? updatedPerson : person);
+            setPersons(updatedPersons);
+            setNewName('');
+            setNewNumber('');
+          });
+        return;
+      }
+      
+      return;
     }
 
     if (newName.length > 0 && newNumber.length > 0) {
@@ -43,6 +61,7 @@ const App = () => {
     }
   };
 
+  // Handler for Person Deletion
   const handleDelete = (person: Person) => {
     if (window.confirm(`Warning! Do you want to delete '${person.name}' from your contacts?`))
     personService.deletePerson(person.id)
