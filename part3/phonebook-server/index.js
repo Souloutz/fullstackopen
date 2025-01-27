@@ -1,11 +1,13 @@
 const express = require('express');
 const dotenv = require('dotenv');
+const morgan = require('morgan');
 
 dotenv.config();
 
 const app = express();
 const port = process.env.PORT | 3001;
 app.use(express.json());
+app.use(morgan('tiny'));
 
 let persons = require('./persons.json');
 
@@ -79,6 +81,13 @@ app.delete('/api/persons/:id', (req, res) => {
 
     res.status(204).end();
 });
+
+// Middleware to Handle Unknown Endpoints
+const unknownEndpoint = (req, res) => {
+    res.status(404).send({ error: 'Unknown Endpoint '});
+};
+
+app.use(unknownEndpoint);
 
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
