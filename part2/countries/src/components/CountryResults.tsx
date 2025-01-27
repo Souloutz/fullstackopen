@@ -25,8 +25,8 @@ const CountryResult: React.FC<Props> =({ countries }) => {
                     <p style={{ marginTop: '4em' }}>Total many matches! Please narrow your search.</p> : 
 
                     countries.map((filtered, index) => 
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <p key={filtered.name}>{filtered.name}</p>
+                        <div key={filtered.name} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <p>{filtered.name}</p>
                             
                             <button style={{ fontSize: '0.8rem', height: 'fit-content' }} onClick={() => handleShow(index)}>
                                 {shown[index] ? 'Hide' : 'Show'}
