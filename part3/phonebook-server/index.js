@@ -25,7 +25,7 @@ app.get('/api/persons', (req, res) => {
 });
 
 const generateID = () => {
-    return Math.floor(Math.random() * Number.MAX_VALUE);
+    return Math.floor(Math.random() * 9999);
 }
 
 app.post('/api/persons', (req, res) => {
