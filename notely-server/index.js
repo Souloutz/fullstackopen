@@ -7,6 +7,15 @@ const app = express();
 const port = process.env.PORT;
 app.use(express.json()); // used for accessing request body
 
+const requestLogger = (req, res, next) => {
+    console.log('Method:', req.method);
+    console.log('Path:  ', req.path);
+    console.log('Body:  ', req.body);
+    console.log('---');
+    next();
+};
+app.use(requestLogger);
+
 let notes = [
     {
         "id": "1",
@@ -81,6 +90,13 @@ app.delete('/api/notes/:id', (req, res) => {
 
     res.status(204).end();
 });
+
+// Middleware to Handle Unknown Endpoints
+const unknownEndpoint = (req, res) => {
+    res.status(404).send({ error: 'Unknown Endpoint '});
+};
+
+app.use(unknownEndpoint);
 
 app.listen(port, () => {
     console.log(`Server running at 'http://localhost:${port}'`);
