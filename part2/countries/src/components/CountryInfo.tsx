@@ -32,9 +32,9 @@ const CountryInfo: React.FC<Props> = ({ country, countryWeather }) => {
             </div>
             <div>
                 <h2>Weather in {country.name}</h2>
-                <p>Temperature: {countryWeather?.temp}</p>
+                <p>Temperature: {countryWeather?.temp} &deg;C</p>
                 <img src={`https://openweathermap.org/img/wn/${countryWeather?.weather.icon}@2x.png`} />
-                <p>Wind: {countryWeather?.wind.speed}</p>
+                <p>Wind: {countryWeather?.wind.speed} m/s</p>
             </div>
         </div>
     );

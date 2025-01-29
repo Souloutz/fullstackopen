@@ -32,9 +32,10 @@ const generateWeather = (weather: any) => {
 
 const apiKey = import.meta.env.VITE_OPEN_WEATHER_KEY;
 const baseURL = 'https://api.openweathermap.org/data/2.5/weather?';
+const unit = 'metric';
 
 const getWeather = async(country: Country) => {
-    const response = axios.get(`${baseURL}lat=${country.coords.latitude}&lon=${country.coords.longitude}&appid=${apiKey}`);
+    const response = axios.get(`${baseURL}lat=${country.coords.latitude}&lon=${country.coords.longitude}&appid=${apiKey}&units=${unit}`);
     return (await response).data;
 };
 
