@@ -28,7 +28,7 @@ const CountryInfo: React.FC<Props> = ({ country, countryWeather }) => {
                         </div>
                     </div>
                 </div>
-                <img style={{ marginTop: '2em', width: '30%', height: 'auto' }} src={country.flags.svg} alt={country.flags.alt} />
+                <img style={{ margin: '0 0', paddingTop: 0, width: '15rem', height: 'auto', alignSelf: 'center' }} src={country.flags.svg} alt={country.flags.alt} />
             </div>
             <div>
                 <h2>Weather in {country.name}</h2>
