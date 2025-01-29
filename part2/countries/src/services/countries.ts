@@ -1,5 +1,22 @@
 import axios from "axios";
-import { Country } from "./country_struct";
+
+export interface Country {
+    name: string;
+    capital?: string;
+    area: number;
+    languages?: string[];
+    flags: Flags;
+    coords: {
+        latitude: number;
+        longitude: number;
+    }
+}
+
+interface Flags {
+    png: string
+    svg: string
+    alt?: string
+}
 
 const generateCountry = (country: any): Country => {
     const countryInfo: Country = {
@@ -9,6 +26,10 @@ const generateCountry = (country: any): Country => {
             png: country.flags.png,
             svg: country.flags.svg,
             alt: country.flags.alt
+        },
+        coords: {
+            latitude: country.latlng[0],
+            longitude: country.latlng[1]
         }
     }
 
