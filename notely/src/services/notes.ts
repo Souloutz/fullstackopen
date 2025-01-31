@@ -9,7 +9,7 @@ export interface Note extends NewNote {
     id: number;
   }
 
-const baseURL = 'http://localhost:3001/api/notes';
+const baseURL = '/api/notes';
 const getResponseData = async (response: Promise<AxiosResponse<any, any>>) => {
     const res = await response;
     return res.data;
