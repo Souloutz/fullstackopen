@@ -5,12 +5,13 @@ const morgan = require('morgan');
 dotenv.config();
 
 const app = express();
-const port = process.env.PORT | 3001;
+const port = process.env.PORT || 3001;
 app.use(express.json());
 app.use(morgan('tiny'));
 
 let persons = require('./persons.json');
 
+app.use(express.static('dist'));
 app.get('/', (req, res) => {
     res.send('<h1>PhoneBook Server</h1>');
 });

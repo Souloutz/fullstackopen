@@ -9,7 +9,7 @@ export interface Person extends NewPerson {
     id: number;
 }
 
-const baseURL = 'http://localhost:3001/persons';
+const baseURL = '/api/persons';
 
 const fetchPersons = async(): Promise<Person[]> => {
     const response = axios.get(baseURL);
