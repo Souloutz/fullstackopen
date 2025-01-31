@@ -92,6 +92,18 @@ app.post('/api/notes', (req, res) => {
     res.json(note);
 });
 
+app.put('/api/notes/:id', (req, res) => {
+    const id = req.params.id;
+    const note = notes.find(note => note.id === id);
+    note.important = !note.important;
+    
+    if (note) {
+        res.json(note);
+    } else {
+        res.status(404).end();
+    }
+});
+
 app.delete('/api/notes/:id', (req, res) => {
     const id = req.params.id;
     notes = notes.filter(note => note.id !== id);
