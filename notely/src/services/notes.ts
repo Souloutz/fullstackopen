@@ -11,8 +11,12 @@ export interface Note extends NewNote {
 
 const baseURL = '/api/notes';
 const getResponseData = async (response: Promise<AxiosResponse<any, any>>) => {
-    const res = await response;
-    return res.data;
+    try {
+        const res = await response;
+        return res.data;
+    } catch (err: any) {
+        return err.response.data.error;
+    }
 };
 
 const fetchNotes = () => {

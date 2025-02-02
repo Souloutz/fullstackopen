@@ -27,10 +27,15 @@ const App = () => {
     };
 
     noteService.createNote(noteObject)
-      .then(createdNote => {
-        setNotes(notes.concat(createdNote));
+      .then((returned: Note | string) => {
+        if (typeof returned === 'string') {
+          setErrorMessage(returned);
+          return;
+        }
+
+        setNotes(notes.concat(returned));
         setNewNote('');
-      });
+      })
   };
 
   const toggleImportance = (id: number) => {
@@ -50,7 +55,6 @@ const App = () => {
         setNotes(notes.filter(note => note.id !== id));
       });
   };
-
 
   const handleNoteChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
     setNewNote(event.target.value);
@@ -77,7 +81,7 @@ const App = () => {
       <form style={{ marginTop: '3rem' }} onSubmit={addNote}>
         <label>Note: </label>
         <input value={newNote} onChange={handleNoteChange} />
-        <button style={{ marginLeft: '1rem' }}type='submit'>Save</button>
+        <button style={{ marginLeft: '1rem' }} type='submit'>Save</button>
       </form>
 
       <Footer />
