@@ -1,10 +1,6 @@
 const mongoose = require('mongoose');
-const dotenv = require('dotenv');
 
-dotenv.config();
-
-const password = process.env.MONGODB_PASSWORD;
-const uri = `mongodb+srv://howardkong826:${password}@fullstackopen.q8zxh.mongodb.net/notely?retryWrites=true&w=majority&appName=FullStackOpen`;
+const uri = process.env.MONGODB_URI;
 
 mongoose.set('strictQuery', false);
 mongoose.connect(uri)
@@ -19,13 +15,22 @@ const noteSchema = new mongoose.Schema({
 const Note = mongoose.model('Note', noteSchema);
 
 const note = new Note({
-    content: 'HTML is easy',
-    important: true,
+    content: process.argv[2],
+    important: process.argv[3],
 })
 
+// Note.find({}).then(result => {
+//     result.forEach(note => {
+//         console.log(note);
+//     })
+//     mongoose.connection.close();
+// });
 note.save()
 .then(result => {
     console.log('Note saved!');
     mongoose.connection.close();
 })
-.catch(err => console.log('Error saving note:', err));
+.catch(err => {
+    console.log('Error saving note:', err);
+    mongoose.connection.close();
+});

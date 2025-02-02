@@ -1,11 +1,12 @@
+require('dotenv').config();
 const express = require('express');
-const dotenv = require('dotenv');
 const cors = require('cors');
+const Note = require('./models/note');
 
-dotenv.config();
-
+// Server Config
 const app = express();
 const port = process.env.PORT || 3001;
+const env = process.env.NODE_ENV;
 
 const options = {
     origin: ['http://localhost:5173', 'http://127.0.0.1:5173']
@@ -13,65 +14,33 @@ const options = {
 app.use(cors(options));
 app.use(express.json()); // used for accessing request body
 
+let notes = [];
+
 const requestLogger = (req, res, next) => {
+    console.log('--- Incoming Request ---')
     console.log('Method:', req.method);
     console.log('Path:  ', req.path);
     console.log('Body:  ', req.body);
-    console.log('---');
+    console.log('------------------------');
     next();
 };
 app.use(requestLogger);
-
-let notes = [
-    {
-        "id": "1",
-        "content": "HTML is easy",
-        "important": false
-    },
-    {
-        "id": "2",
-        "content": "Browser can execute only JavaScript",
-        "important": false
-    },
-    {
-        "id": "3",
-        "content": "GET and POST are the most important methods of HTTP protocol",
-        "important": false
-    },
-    {   
-        "id": "4",
-        "content": "Saved",
-        "important": false
-    }
-];
-
-app.use(express.static('dist'));
-
-app.get('/', (req, res) => {
-    res.send('<h1>Hello World!</h1>');
-});
+app.use(express.static('dist')); // serve index.html in production build on '/' route
 
 app.get('/api/notes', (req, res) => {
-    res.json(notes);
+    Note.find({}).then(notes => {
+        res.json(notes);
+    });
 });
 
 app.get('/api/notes/:id', (req, res) => {
-    const id = req.params.id;
-    const note = notes.find(note => note.id === id);
-    
-    if (note) {
-        res.json(note);
-    } else {
-        // end responds without sending any data
-        res.status(404).end();
-    }
-});
+    Note.findById(req.params.id).then(note => {
+        if (note === null) 
+            return res.status(404).end();
 
-const generateID = () => {
-    // console.log(...notes.map(note => Number(note.id)));
-    const maxID = notes.length > 0 ? Math.max(...notes.map(note => Number(note.id))) : 0;
-    return String(maxID + 1);
-}
+        res.json(note);
+    })
+});
 
 app.post('/api/notes', (req, res) => {
     const body = req.body;
@@ -82,14 +51,14 @@ app.post('/api/notes', (req, res) => {
         });
     }
 
-    const note = {
-        id: generateID(),
+    const note = new Note({
         content: body.content,
         important: Boolean(body.important) || false,
-    }
+    });
 
-    notes = notes.concat(note);
-    res.json(note);
+    note.save().then(savedNote => {
+        res.json(savedNote);
+    })
 });
 
 app.put('/api/notes/:id', (req, res) => {
@@ -119,5 +88,8 @@ const unknownEndpoint = (req, res) => {
 app.use(unknownEndpoint);
 
 app.listen(port, () => {
-    console.log(`Server running at 'http://localhost:${port}'`);
+    if (env === "development")
+        console.log(`Server running at 'http://localhost:${port}'`);
+    else
+        console.log(`Server running on port ${port}`);
 });
