@@ -44,8 +44,7 @@ const App = () => {
       if (window.confirm(`'${existingPerson.name}' has already been added! Do you wish to replace the previous number?`)) {
         const updatedPerson = {...newPerson, id: existingPerson.id};
         personService.updatePerson(updatedPerson)
-          .then(updatedPerson => {
-
+          .then(() => {
             // Replace updated person in copied state array
             const updatedPersons = [...persons].map(person => person.id === updatedPerson.id ? updatedPerson : person);
             setPersons(updatedPersons);
@@ -81,13 +80,13 @@ const App = () => {
   // Handler for Person Deletion
   const handleDelete = (person: Person) => {
     if (window.confirm(`Warning! Do you want to delete '${person.name}' from your contacts?`))
-    personService.deletePerson(person.id)
-      .then(deletedPerson => {
-        const updatedPersons = [...persons].filter(person => person.id !== deletedPerson.id);
-        setPersons(updatedPersons);
+      personService.deletePerson(person.id)
+        .then(() => {
+          const updatedPersons = [...persons].filter(p => p.id !== person.id);
+          setPersons(updatedPersons);
 
-        displayNotification(`Successfully removed '${deletedPerson.name}' from the phonebook!`);
-      });
+          displayNotification(`Successfully removed '${person.name}' from the phonebook!`);
+        });
   };
 
   const personsToShow = showAll ? persons : persons.filter(person => person.name.toLowerCase().includes(search.toLowerCase()))
