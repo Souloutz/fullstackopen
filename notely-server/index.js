@@ -51,12 +51,12 @@ app.post('/api/notes', (req, res) => {
         });
     }
 
-    const note = new Note({
+    const newNote = new Note({
         content: body.content,
         important: Boolean(body.important) || false,
     });
 
-    note.save().then(savedNote => {
+    newNote.save().then(savedNote => {
         res.json(savedNote);
     })
 });
