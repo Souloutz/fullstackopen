@@ -27,7 +27,7 @@ const requestLogger = (req, res, next) => {
 app.use(requestLogger);
 app.use(express.static('dist')); // serve index.html in production build on '/' route
 
-app.get('/api/notes', (req, res) => {
+app.get('/api/notes', (req, res, next) => {
     Note.find({})
         .then(notes => {
             res.json(notes);
@@ -35,7 +35,7 @@ app.get('/api/notes', (req, res) => {
         .catch(err => next(err));
 });
 
-app.get('/api/notes/:id', (req, res) => {
+app.get('/api/notes/:id', (req, res, next) => {
     Note.findById(req.params.id)
         .then(note => {
             if (note === null) 
@@ -46,11 +46,8 @@ app.get('/api/notes/:id', (req, res) => {
         .catch(err => next(err));
 });
 
-app.post('/api/notes', (req, res) => {
+app.post('/api/notes', (req, res, next) => {
     const body = req.body;
-
-    if (!body.content) 
-        return res.status(400).json({ error: 'Content missing' });
 
     const newNote = new Note({
         content: body.content,
@@ -64,22 +61,21 @@ app.post('/api/notes', (req, res) => {
         .catch(err => next(err));
 });
 
-app.put('/api/notes/:id', (req, res) => {
-    const body = req.body
+app.put('/api/notes/:id', (req, res, next) => {
+    const { content, important } = req.body;
     
-    const note = {
-        content: body.content,
-        important: body.important,
-    }
-
-    Note.findByIdAndUpdate(req.params.id, note,{ new: true })
+    Note.findByIdAndUpdate(
+            req.params.id, 
+            { content, important }, 
+            { new: true, runValidators: true, context: 'query' }
+        )
         .then(updatedNote => {
             res.json(updatedNote);
         })
         .catch(err => next(err));
 });
 
-app.delete('/api/notes/:id', (req, res) => {
+app.delete('/api/notes/:id', (req, res, next) => {
     Note.findByIdAndDelete(req.params.id)
         .then(() => {
             res.status(204).end();
@@ -97,7 +93,9 @@ const errorHandler = (err, req, res, next) => {
     console.log(err.message);
 
     if (err.name === 'CastError')
-        return res.status(400).send({ error: 'Malformatted ID' });
+        return res.status(400).json({ error: 'Malformatted ID' });
+    else if (err.name === 'ValidationError')
+        return res.status(400).json({ error: err.message });
 
     next(err);
 }
