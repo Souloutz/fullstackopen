@@ -23,7 +23,10 @@ app.get('/info', (req, res) => {
                 <p>${(new Date()).toUTCString()}</p>
             `);
         })
-        .catch(res.status(500).end());
+        .catch(err => {
+            console.log(err);
+            res.status(500).end();
+        });
 });
 
 app.get('/api/persons', (req, res) => {
@@ -31,7 +34,10 @@ app.get('/api/persons', (req, res) => {
         .then(people => {
             return res.json(people);
         })
-        .catch(() => res.status(500).end());
+        .catch(err => {
+            console.log(err);
+            res.status(500).end()
+        });
 });
 
 app.post('/api/persons', (req, res) => {
@@ -54,7 +60,10 @@ app.post('/api/persons', (req, res) => {
                 res.status(201).json(returnedNote);
             });
         })
-        .catch(() => res.status(500).end());
+        .catch(err => {
+            console.log(err);
+            res.status(500).end()
+        });
 });
 
 app.get('/api/persons/:id', (req, res) => {
@@ -65,23 +74,32 @@ app.get('/api/persons/:id', (req, res) => {
         
             res.json(person);
         })
-        .catch(() => res.status(500).end());
+        .catch(err => {
+            console.log(err);
+            res.status(400).end()
+        });
 });
 
 app.put('/api/persons/:id', (req, res) => {
     const body = req.body;
-    const name = body.name;
-    const number = body.number;
 
-    if (!body || !name || !number) {
+    if (!body) {
         return res.status(400).json({ error: 'Content missing' });
     }
 
-    Person.findByIdAndUpdate(req.params.id, body)
+    const person = {
+        name: body.name,
+        number: body.number,
+    }
+
+    Person.findByIdAndUpdate(req.params.id, person, { new: true })
         .then(updatedPerson => {
             res.json(updatedPerson)
         })
-        .catch(() => res.status(500).end());
+        .catch(err => {
+            console.log(err);
+            res.status(400).end()
+        });
 });
 
 app.delete('/api/persons/:id', (req, res) => {
@@ -92,15 +110,27 @@ app.delete('/api/persons/:id', (req, res) => {
 
             res.status(204).end();
         })
-        .catch(() => res.status(500).end());
+        .catch(err => {
+            console.log(err);
+            res.status(400).end()
+        });
 });
 
 // Middleware to Handle Unknown Endpoints
 const unknownEndpoint = (req, res) => {
     res.status(404).send({ error: 'Unknown Endpoint '});
 };
-
 app.use(unknownEndpoint);
+
+const errorHandler = (err, req, res, next) => {
+    console.log(err.message);
+
+    if (err.name === 'CastError')
+        return res.status(400).json({ error: 'Malformatted ID' });
+
+    next(err);
+}
+app.use(errorHandler);
 
 app.listen(port, () => {
     if (env === 'development')
