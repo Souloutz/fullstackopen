@@ -44,9 +44,9 @@ const App = () => {
       if (window.confirm(`'${existingPerson.name}' has already been added! Do you wish to replace the previous number?`)) {
         const updatedPerson = {...newPerson, id: existingPerson.id};
         personService.updatePerson(updatedPerson)
-          .then(() => {
+          .then(returnedPerson => {
             // Replace updated person in copied state array
-            const updatedPersons = [...persons].map(person => person.id === updatedPerson.id ? updatedPerson : person);
+            const updatedPersons = [...persons].map(person => person.id === updatedPerson.id ? returnedPerson : person);
             setPersons(updatedPersons);
             setNewName('');
             setNewNumber('');
