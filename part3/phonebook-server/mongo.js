@@ -1,38 +1,34 @@
 const mongoose = require('mongoose');
-const dotenv = require('dotenv');
 
 if (process.argv.length < 4) {
     console.log('Please specify a name and phone-number!')
     process.exit(1);
 }
 
-dotenv.config();
-
-const password = process.env.MONGODB_PASSWORD
-const uri = `mongodb+srv://howardkong826:${password}@fullstackopen.q8zxh.mongodb.net/phonebook?retryWrites=true&w=majority&appName=FullStackOpen`;
+const url = process.env.MONGODB_URI;
 
 mongoose.set('strictQuery', false);
-mongoose.connect(uri)
+mongoose.connect(url)
 .then(console.log('Connected to MongoDB'))
 .catch(err => console.log('Could not connect to MongoDB', err));
 
-const userSchema = mongoose.Schema({
+const personSchema = mongoose.Schema({
     name: String,
     number: String,
 });
 
-const User = mongoose.model('User', userSchema);
+const Person = mongoose.model('Person', personSchema);
 
 const name = process.argv[2];
 const number = process.argv[3];
-const user = new User({ name, number })
+const person = new Person({ name, number })
 
-user.save()
-.then(result => {
-    console.log(`Added { name: '${result.name}', number: '${result.number}' } to phonebook`);
-    mongoose.connection.close();
-})
-.catch(err => {
-    console.log('Error saving user:', err);
-    mongoose.connection.close();
-});
+person.save()
+    .then(result => {
+        console.log(`Added { name: '${result.name}', number: '${result.number}' } to phonebook`);
+        mongoose.connection.close();
+    })
+    .catch(err => {
+        console.log('Error saving user:', err);
+        mongoose.connection.close();
+    });
