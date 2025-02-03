@@ -1,4 +1,3 @@
-// require('dotenv').config();
 const mongoose = require('mongoose');
 
 const url = process.env.MONGODB_URI;
@@ -6,7 +5,7 @@ console.log(`Connecting to ${url}`);
 
 mongoose.set('strictQuery', false);
 mongoose.connect(url)
-    .then(_ => {
+    .then(() => {
         console.log('Connected to MongoDB');
     })
     .catch(err => {
@@ -24,9 +23,9 @@ const noteSchema = new mongoose.Schema({
 
 noteSchema.set('toJSON', {
     transform: (document, returnedObject) => {
-        returnedObject.id = document._id.toString()
-        delete returnedObject._id
-        delete returnedObject.__v
+        returnedObject.id = document._id.toString();
+        delete returnedObject._id;
+        delete returnedObject.__v;
     }
 });
 

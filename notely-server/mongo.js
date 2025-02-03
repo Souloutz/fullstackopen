@@ -4,8 +4,8 @@ const uri = process.env.MONGODB_URI;
 
 mongoose.set('strictQuery', false);
 mongoose.connect(uri)
-.then(console.log('Connected to MongoDB'))
-.catch(err => console.log('Could not connect to MongoDB', err));
+    .then(console.log('Connected to MongoDB'))
+    .catch(err => console.log('Could not connect to MongoDB', err));
 
 const noteSchema = new mongoose.Schema({
     content: String,
@@ -17,7 +17,7 @@ const Note = mongoose.model('Note', noteSchema);
 const note = new Note({
     content: process.argv[2],
     important: process.argv[3],
-})
+});
 
 // Note.find({}).then(result => {
 //     result.forEach(note => {
@@ -26,11 +26,11 @@ const note = new Note({
 //     mongoose.connection.close();
 // });
 note.save()
-.then(result => {
-    console.log('Note saved!');
-    mongoose.connection.close();
-})
-.catch(err => {
-    console.log('Error saving note:', err);
-    mongoose.connection.close();
-});
+    .then(() => {
+        console.log('Note saved!');
+        mongoose.connection.close();
+    })
+    .catch(err => {
+        console.log('Error saving note:', err);
+        mongoose.connection.close();
+    });

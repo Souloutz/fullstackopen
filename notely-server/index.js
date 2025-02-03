@@ -14,10 +14,8 @@ const options = {
 app.use(cors(options));
 app.use(express.json()); // used for accessing request body
 
-let notes = [];
-
 const requestLogger = (req, res, next) => {
-    console.log('--- Incoming Request ---')
+    console.log('--- Incoming Request ---');
     console.log('Method:', req.method);
     console.log('Path:  ', req.path);
     console.log('Body:  ', req.body);
@@ -38,7 +36,7 @@ app.get('/api/notes', (req, res, next) => {
 app.get('/api/notes/:id', (req, res, next) => {
     Note.findById(req.params.id)
         .then(note => {
-            if (note === null) 
+            if (note === null)
                 return res.status(404).end();
 
             res.json(note);
@@ -63,12 +61,12 @@ app.post('/api/notes', (req, res, next) => {
 
 app.put('/api/notes/:id', (req, res, next) => {
     const { content, important } = req.body;
-    
+
     Note.findByIdAndUpdate(
-            req.params.id, 
-            { content, important }, 
-            { new: true, runValidators: true, context: 'query' }
-        )
+        req.params.id,
+        { content, important },
+        { new: true, runValidators: true, context: 'query' }
+    )
         .then(updatedNote => {
             res.json(updatedNote);
         })
@@ -85,7 +83,7 @@ app.delete('/api/notes/:id', (req, res, next) => {
 
 // Middleware to Handle Unknown Endpoints
 const unknownEndpoint = (req, res) => {
-    res.status(404).send({ error: 'Unknown Endpoint '});
+    res.status(404).send({ error: 'Unknown Endpoint ' });
 };
 app.use(unknownEndpoint);
 
@@ -98,11 +96,11 @@ const errorHandler = (err, req, res, next) => {
         return res.status(400).json({ error: err.message });
 
     next(err);
-}
+};
 app.use(errorHandler);
 
 app.listen(port, () => {
-    if (env === "development")
+    if (env === 'development')
         console.log(`Server running at 'http://localhost:${port}'`);
     else
         console.log(`Server running on port ${port}`);
