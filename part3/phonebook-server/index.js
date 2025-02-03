@@ -39,10 +39,10 @@ app.post('/api/persons', (req, res, next) => {
 
     Person.find({ name: name })
         .then(people => {
-            if (people.length != 0) {
+            if (people.length !== 0) {
                 return res.status(400).json({ error: 'Duplicate name (must be unique)' });
             }
-            
+
             const newPerson = new Person({ name, number });
             newPerson.save()
                 .then(returnedNote => {
@@ -58,7 +58,7 @@ app.get('/api/persons/:id', (req, res, next) => {
         .then(person => {
             if (person === null)
                 return res.status(404).end();
-        
+
             res.json(person);
         })
         .catch(err => next(err));
@@ -68,12 +68,12 @@ app.put('/api/persons/:id', (req, res, next) => {
     const { name, number } = req.body;
 
     Person.findByIdAndUpdate(
-            req.params.id, 
-            { name, number}, 
-            { new: true, runValidators: true, context: 'query' }
-        )
+        req.params.id,
+        { name, number },
+        { new: true, runValidators: true, context: 'query' }
+    )
         .then(updatedPerson => {
-            res.json(updatedPerson)
+            res.json(updatedPerson);
         })
         .catch(err => next(err));
 });
@@ -91,7 +91,7 @@ app.delete('/api/persons/:id', (req, res, next) => {
 
 // Middleware to Handle Unknown Endpoints
 const unknownEndpoint = (req, res) => {
-    res.status(404).send({ error: 'Unknown Endpoint '});
+    res.status(404).send({ error: 'Unknown Endpoint ' });
 };
 app.use(unknownEndpoint);
 
@@ -104,12 +104,12 @@ const errorHandler = (err, req, res, next) => {
         return res.status(400).json({ error: err.message });
 
     next(err);
-}
+};
 app.use(errorHandler);
 
 app.listen(port, () => {
     if (env === 'development')
         console.log(`Server running at http://localhost:${port}`);
-    else 
+    else
         console.log(`Server running on port ${port}`);
 });
