@@ -7,113 +7,128 @@ import personService, { NewPerson, Person } from './services/person';
 import Notification from './components/Notification';
 
 const App = () => {
-  const [persons, setPersons] = useState<Person[]>([]);
-  const [newName, setNewName] = useState('');
-  const [newNumber, setNewNumber] = useState('');
-  const [search, setSearch] = useState('');
-  const [showAll, setShowAll] = useState(true);
-  const [notification, setNotification] = useState<string | null>(null);
+    const [persons, setPersons] = useState<Person[]>([]);
+    const [newName, setNewName] = useState('');
+    const [newNumber, setNewNumber] = useState('');
+    const [search, setSearch] = useState('');
+    const [showAll, setShowAll] = useState(true);
+    const [notification, setNotification] = useState<string | null>(null);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  // Helper Function for useEffect
-  const fetchData = () => {
-    personService.fetchPersons()
-      .then(persons => {
-        console.log('Fetched!');
-        setPersons(persons);
-    });
-  };
-  useEffect(fetchData, []);
+    // Helper Function for useEffect
+    const fetchData = () => {
+        personService.fetchPersons()
+        .then(persons => {
+            console.log('Fetched!');
+            setPersons(persons);
+        });
+    };
+    useEffect(fetchData, []);
 
-  // Helper Function for Displaying Notification
-  const displayNotification = (message: string) => {
-    setNotification(message);
-    setTimeout(() => {
-      setNotification(null);
-    }, 5000);
-  };
+    // Helper Function for Displaying Notification
+    const displayNotification = (message: string) => {
+        setNotification(message);
+        setTimeout(() => {
+        setNotification(null);
+        }, 5000);
+    };
 
-  // Handler for Form Submittion
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault(); // prevent default GET and reloading of page
-    
-    const newPerson: NewPerson = {name: newName, number: newNumber};
-    const existingPerson: Person | undefined = persons.find(person => person.name === newPerson.name);
-    
-    // console.log('Clicked!', 'New:', newPerson, 'Current:', persons);
-    if (existingPerson !== undefined) {
-      if (window.confirm(`'${existingPerson.name}' has already been added! Do you wish to replace the previous number?`)) {
-        const updatedPerson = {...newPerson, id: existingPerson.id};
-        personService.updatePerson(updatedPerson)
-          .then(returnedPerson => {
-            // Replace updated person in copied state array
-            const updatedPersons = [...persons].map(person => person.id === updatedPerson.id ? returnedPerson : person);
+    // Helper Function for Displaying Notification
+    const displayError = (message: string) => {
+        setErrorMessage(message);
+        setTimeout(() => {
+        setErrorMessage(null);
+        }, 5000);
+    };
+
+    // Handler for Form Submittion
+    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault(); // prevent default GET and reloading of page
+        
+        const newPerson: NewPerson = {name: newName, number: newNumber};
+        const existingPerson: Person | undefined = persons.find(person => person.name === newPerson.name);
+        
+        // console.log('Clicked!', 'New:', newPerson, 'Current:', persons);
+        if (existingPerson !== undefined) {
+        if (window.confirm(`'${existingPerson.name}' has already been added! Do you wish to replace the previous number?`)) {
+            const updatedPerson = {...newPerson, id: existingPerson.id};
+            personService.updatePerson(updatedPerson)
+            .then(returnedPerson => {
+                // Replace updated person in copied state array
+                const updatedPersons = [...persons].map(person => person.id === updatedPerson.id ? returnedPerson : person);
+                setPersons(updatedPersons);
+                setNewName('');
+                setNewNumber('');
+
+                displayNotification(`Successfully updated number for '${updatedPerson.name}'!`);
+            })
+            .catch(_ => {
+                displayNotification(`Error updating '${updatedPerson.name}'.`);
+            });
+
+            return;
+        }
+        
+        displayNotification(`'${existingPerson.name}' has already been added to the phonebook!`);
+        return;
+        }
+
+        if (newName.length > 0 && newNumber.length > 0) {
+        personService.createPerson(newPerson)
+            .then((returned: Person | string) => {
+            if (typeof returned === 'string') {
+                displayError(returned);
+                return;
+            }
+
+            const updatedPersons = [...persons].concat(returned);
             setPersons(updatedPersons);
             setNewName('');
             setNewNumber('');
 
-            displayNotification(`Successfully updated number for '${updatedPerson.name}'!`);
-          })
-          .catch(_ => {
-            displayNotification(`Error updating '${updatedPerson.name}'.`);
-          });
+            displayNotification(`Successfully added '${newPerson.name}' to phonebook!`);
+            });
+        }
+    };
 
-        return;
-      }
-      
-      displayNotification(`'${existingPerson.name}' has already been added to the phonebook!`);
-      return;
-    }
+    // Handler for Person Deletion
+    const handleDelete = (person: Person) => {
+        if (window.confirm(`Warning! Do you want to delete '${person.name}' from your contacts?`))
+        personService.deletePerson(person.id)
+            .then(() => {
+            const updatedPersons = [...persons].filter(p => p.id !== person.id);
+            setPersons(updatedPersons);
 
-    if (newName.length > 0 && newNumber.length > 0) {
-      personService.createPerson(newPerson)
-        .then(createdPerson => {
-          const updatedPersons = [...persons].concat(createdPerson);
-          setPersons(updatedPersons);
-          setNewName('');
-          setNewNumber('');
+            displayNotification(`Successfully removed '${person.name}' from the phonebook!`);
+            });
+    };
 
-          displayNotification(`Successfully added '${createdPerson.name}' to phonebook!`);
-        });
-    }
-  };
+    const personsToShow = showAll ? persons : persons.filter(person => person.name.toLowerCase().includes(search.toLowerCase()))
 
-  // Handler for Person Deletion
-  const handleDelete = (person: Person) => {
-    if (window.confirm(`Warning! Do you want to delete '${person.name}' from your contacts?`))
-      personService.deletePerson(person.id)
-        .then(() => {
-          const updatedPersons = [...persons].filter(p => p.id !== person.id);
-          setPersons(updatedPersons);
+    return (
+        <>
+        <Notification message={notification} color='forestgreen' />
+        <Notification message={errorMessage} color='red' />
+        <div style={{ display: 'flex', gap: '25%' }}>
+            <div>
+            <h2>Phonebook</h2>
 
-          displayNotification(`Successfully removed '${person.name}' from the phonebook!`);
-        });
-  };
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '3rem'}}>
+                <Search setSearch={setSearch} setShowAll={setShowAll} />
+                <Form inputName={newName} inputNumber={newNumber} handleSubmit={handleSubmit} setNewName={setNewName} setNewNumber={setNewNumber} />
+            </div>
+            </div>
 
-  const personsToShow = showAll ? persons : persons.filter(person => person.name.toLowerCase().includes(search.toLowerCase()))
-
-  return (
-    <>
-      <Notification message={notification} />
-      <div style={{ display: 'flex', gap: '25%' }}>
-        <div>
-          <h2>Phonebook</h2>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '3rem'}}>
-            <Search setSearch={setSearch} setShowAll={setShowAll} />
-            <Form inputName={newName} inputNumber={newNumber} handleSubmit={handleSubmit} setNewName={setNewName} setNewNumber={setNewNumber} />
-          </div>
+            <div style={{ width: '100%' }}>
+            <h2>Numbers</h2>
+            {
+                persons.length === 0 ? <p>No numbers saved</p> :
+                personsToShow.map(person => <PersonInfo key={person.number} person={person} handleDelete={handleDelete} />)
+            }
+            </div>
         </div>
-
-        <div style={{ width: '100%' }}>
-          <h2>Numbers</h2>
-          {
-            persons.length === 0 ? <p>No numbers saved</p> :
-            personsToShow.map(person => <PersonInfo key={person.number} person={person} handleDelete={handleDelete} />)
-          }
-        </div>
-      </div>
-    </>
-  );
+        </>
+    );
 };
 
 export default App;
