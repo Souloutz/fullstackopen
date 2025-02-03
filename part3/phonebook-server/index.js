@@ -15,7 +15,7 @@ app.get('/', (req, res) => {
     res.send('<h1>PhoneBook Server</h1>');
 });
 
-app.get('/info', (req, res) => {
+app.get('/info', (req, res, next) => {
     Person.find({})
         .then(people => {
             return res.send(`
@@ -23,31 +23,19 @@ app.get('/info', (req, res) => {
                 <p>${(new Date()).toUTCString()}</p>
             `);
         })
-        .catch(err => {
-            console.log(err);
-            res.status(500).end();
-        });
+        .catch(err => next(err));
 });
 
-app.get('/api/persons', (req, res) => {
+app.get('/api/persons', (req, res, next) => {
     Person.find({})
         .then(people => {
             return res.json(people);
         })
-        .catch(err => {
-            console.log(err);
-            res.status(500).end()
-        });
+        .catch(err => next(err));
 });
 
-app.post('/api/persons', (req, res) => {
-    const body = req.body;
-    const name = body.name;
-    const number = body.number;
-
-    if (!body || !name || !number) {
-        return res.status(400).json({ error: 'Content missing' });
-    }
+app.post('/api/persons', (req, res, next) => {
+    const { name, number } = req.body;
 
     Person.find({ name: name })
         .then(people => {
@@ -56,17 +44,16 @@ app.post('/api/persons', (req, res) => {
             }
             
             const newPerson = new Person({ name, number });
-            newPerson.save().then(returnedNote => {
-                res.status(201).json(returnedNote);
-            });
+            newPerson.save()
+                .then(returnedNote => {
+                    res.status(201).json(returnedNote);
+                })
+                .catch(err => next(err));
         })
-        .catch(err => {
-            console.log(err);
-            res.status(500).end()
-        });
+        .catch(err => next(err));
 });
 
-app.get('/api/persons/:id', (req, res) => {
+app.get('/api/persons/:id', (req, res, next) => {
     Person.findById(req.params.id)
         .then(person => {
             if (person === null)
@@ -74,35 +61,24 @@ app.get('/api/persons/:id', (req, res) => {
         
             res.json(person);
         })
-        .catch(err => {
-            console.log(err);
-            res.status(400).end()
-        });
+        .catch(err => next(err));
 });
 
-app.put('/api/persons/:id', (req, res) => {
-    const body = req.body;
+app.put('/api/persons/:id', (req, res, next) => {
+    const { name, number } = req.body;
 
-    if (!body) {
-        return res.status(400).json({ error: 'Content missing' });
-    }
-
-    const person = {
-        name: body.name,
-        number: body.number,
-    }
-
-    Person.findByIdAndUpdate(req.params.id, person, { new: true })
+    Person.findByIdAndUpdate(
+            req.params.id, 
+            { name, number}, 
+            { new: true, runValidators: true, context: 'query' }
+        )
         .then(updatedPerson => {
             res.json(updatedPerson)
         })
-        .catch(err => {
-            console.log(err);
-            res.status(400).end()
-        });
+        .catch(err => next(err));
 });
 
-app.delete('/api/persons/:id', (req, res) => {
+app.delete('/api/persons/:id', (req, res, next) => {
     Person.findByIdAndDelete(req.params.id)
         .then(deletedPerson => {
             if (!deletedPerson)
@@ -110,10 +86,7 @@ app.delete('/api/persons/:id', (req, res) => {
 
             res.status(204).end();
         })
-        .catch(err => {
-            console.log(err);
-            res.status(400).end()
-        });
+        .catch(err => next(err));
 });
 
 // Middleware to Handle Unknown Endpoints
@@ -126,7 +99,9 @@ const errorHandler = (err, req, res, next) => {
     console.log(err.message);
 
     if (err.name === 'CastError')
-        return res.status(400).json({ error: 'Malformatted ID' });
+        return res.status(400).send({ error: 'Malformatted ID' });
+    else if (err.name === 'ValidationError')
+        return res.status(400).json({ error: err.message });
 
     next(err);
 }

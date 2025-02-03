@@ -4,11 +4,15 @@ const url = process.env.MONGODB_URI;
 
 mongoose.set('strictQuery', false);
 mongoose.connect(url)
-    .then(console.log('Connected to MongoDB'))
+    .then(() => console.log('Connected to MongoDB'))
     .catch(err => ('Error connecting to MongoDB:', err.message));
 
 const personSchema = mongoose.Schema({
-    name: String,
+    name: {
+        type: String,
+        minLength: 3,
+        required: true,
+    },
     number: String,
 });
 
