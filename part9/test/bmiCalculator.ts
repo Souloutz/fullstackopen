@@ -1,4 +1,4 @@
-import { System } from "./utils/parse";
+import utils, { System } from "./utils/parse";
 
 const calculateBMI = (height: number, weight: number, type: System) => {
     let BMI;
@@ -33,15 +33,19 @@ const calculateBMI = (height: number, weight: number, type: System) => {
         return "Obese (Classs III)";
 }
 
-// try {
-//     const { height, weight, type } = utils.parseArguments(process.argv);
-//     console.log(calculateBMI(height, weight, type));
-// } catch (error: unknown) {
-//     let errorMessage = 'Something bad happened.'
-//     if (error instanceof Error) {
-//         errorMessage += ' Error: ' + error.message;
-//     }
-//     console.log(errorMessage);
-// }
-
 export default calculateBMI;
+
+// Only runs if module run directly
+// Like Python's __name__ == "__main__"
+if (require.main === module) {
+    try {
+        const { height, weight, type } = utils.parseArguments(process.argv);
+        console.log(calculateBMI(height, weight, type));
+    } catch (error: unknown) {
+        let errorMessage = 'Something bad happened.'
+        if (error instanceof Error) {
+            errorMessage += ' Error: ' + error.message;
+        }
+        console.log(errorMessage);
+    }
+}

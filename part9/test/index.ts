@@ -21,7 +21,7 @@ app.get('/bmi', (req, res) => {
 
     if (!isNaN(height) && !isNaN(weight) && utils.isSystem(type)) {
         const bmi = calculateBMI(height, weight, type);
-        res.status(200).json({ BMI: bmi });
+        res.status(200).json({ height, weight, bmi });
     }
 
     res.status(400).json({ error: "Query parameters invalid" });
