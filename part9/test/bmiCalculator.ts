@@ -4,10 +4,11 @@ const calculateBMI = (height: number, weight: number, type: System) => {
     let BMI;
 
     switch (type) {
-        case 'metric':
-            let convertedHeight = height / 100;
+        case 'metric': { 
+            const convertedHeight = height / 100;
             BMI = weight / (convertedHeight ** 2);
-            break;
+            break; 
+        }
         case 'imperial':
             BMI = (weight / (height ** 2)) * 703;
             break;
@@ -31,7 +32,7 @@ const calculateBMI = (height: number, weight: number, type: System) => {
         return "Obese (Class II)";
     else
         return "Obese (Classs III)";
-}
+};
 
 export default calculateBMI;
 
@@ -42,7 +43,7 @@ if (require.main === module) {
         const { height, weight, type } = utils.parseArguments(process.argv);
         console.log(calculateBMI(height, weight, type));
     } catch (error: unknown) {
-        let errorMessage = 'Something bad happened.'
+        let errorMessage = 'Something bad happened.';
         if (error instanceof Error) {
             errorMessage += ' Error: ' + error.message;
         }

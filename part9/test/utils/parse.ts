@@ -6,8 +6,8 @@ interface BMIValues {
     type: System;
 }
 
-const isSystem = (value: any): value is System => {
-    return value === 'metric' || value === 'imperial';
+const isSystem = (value: unknown): value is System => {
+    return String(value) === 'metric' || String(value) === 'imperial';
 };
 
 const parseArguments = (args: string[]): BMIValues => {
@@ -19,7 +19,7 @@ const parseArguments = (args: string[]): BMIValues => {
             height: Number(args[2]),
             weight: Number(args[3]),
             type: args[4],
-        }
+        };
     } else {
         throw new Error('Provided values were not numbers!');
     }
