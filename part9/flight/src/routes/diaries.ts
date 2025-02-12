@@ -5,7 +5,7 @@ import { NonSensitiveDiaryEntry } from '../types';
 const router = express.Router();
 
 router.get('/', (_req: Request, res: Response<NonSensitiveDiaryEntry[   ]>) => {
-   res.send(diaryService.getNonSensitiveEntries());
+    res.send(diaryService.getNonSensitiveEntries());
 });
 
 router.get('/:id', (req, res) => {
@@ -20,12 +20,18 @@ router.get('/:id', (req, res) => {
 });
 
 router.post('/', (req: Request, res: Response) => {
-    const { date, weather, visibility, comment } = req.body;
-    const addedEntry = diaryService.addDiary(
-        date, weather, visibility, comment
-    );
+    try {
+        const newDiaryEntry = diaryService.toNewDiaryEntry(req.body);
+        const addedEntry = diaryService.addDiary(newDiaryEntry);
 
-    res.json(addedEntry);
+        res.json(addedEntry);
+    } catch (err: unknown) {
+        let errMessage = 'Something went wrong.';
+        if (err instanceof Error)
+            errMessage += ` Error: ${err.message}`;
+
+        res.status(400).send(errMessage);
+    }
 });
 
 export default router;

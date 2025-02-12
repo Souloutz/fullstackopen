@@ -22,7 +22,7 @@ export default tseslint.config({
         '@stylistic/indent': ['error', 4],
         '@stylistic/semi': ['error', 'always'],
         '@stylistic/quotes': ['error', 'single'],
-        '@stylistic/linebreak-style': ['error', 'CRLF'],
+        '@stylistic/linebreak-style': ['error', 'unix'],
         '@typescript-eslint/no-unsafe-assignment': 'error',
         '@typescript-eslint/no-explicit-any': 'error',
         '@typescript-eslint/explicit-function-return-type': 'off',
