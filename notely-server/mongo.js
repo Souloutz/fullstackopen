@@ -23,7 +23,7 @@ if (require.main === module) {
     Note.find({}).then(result => {
         result.forEach(note => {
             console.log(note);
-        })
+        });
         mongoose.connection.close();
     });
 

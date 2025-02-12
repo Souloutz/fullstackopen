@@ -7,7 +7,7 @@ const middleware = require('./utils/middleware');
 const mongoose = require('mongoose');
 
 // Backend Config
-logger.info(`Connecting to MongoDB...`);
+logger.info('Connecting to MongoDB...');
 mongoose.set('strictQuery', false);
 mongoose.connect(config.MONGODB_URI)
     .then(() => logger.info('Connected to MongoDB'))
