@@ -1,14 +1,15 @@
 import fs from 'fs';
 import path from 'path';
+import zod from 'zod';
 import { DiaryEntry } from '../src/types';
-import diaryService from '../src/services/diaryService';
 import entries from './diaryEntries.json';
 import logger from '../src/utils/logger';
+import newEntrySchema from '../src/utils/utility';
 
 // Requires JSON to be in correct format
 const diaryEntries: DiaryEntry[] = entries.map((obj) => {
-    const diaryEntry = diaryService.toNewDiaryEntry(obj) as DiaryEntry;
-    diaryEntry.id = Number(obj.id);
+    const diaryEntry = newEntrySchema.parse(obj) as DiaryEntry;
+    diaryEntry.id = zod.number().parse(obj.id);
     return diaryEntry;
 });
 
