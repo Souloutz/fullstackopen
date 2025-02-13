@@ -1,6 +1,7 @@
 import express, { Request, Response } from 'express';
 import diaryService from '../services/diaryService';
 import { NonSensitiveDiaryEntry } from '../types';
+import { ZodError } from 'zod';
 
 const router = express.Router();
 
@@ -26,11 +27,10 @@ router.post('/', (req: Request, res: Response) => {
 
         res.json(addedEntry);
     } catch (err: unknown) {
-        let errMessage = 'Something went wrong.';
-        if (err instanceof Error)
-            errMessage += ` Error: ${err.message}`;
+        if (err instanceof ZodError)
+            res.status(400).send({ error: err.issues });
 
-        res.status(400).send(errMessage);
+        res.status(400).send({ error: 'unknown error' });
     }
 });
 

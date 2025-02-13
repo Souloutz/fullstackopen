@@ -17,7 +17,8 @@
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "flight": "file:",
-    "morgan": "^1.10.0"
+    "morgan": "^1.10.0",
+    "zod": "^3.24.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.20.0",
