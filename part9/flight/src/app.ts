@@ -15,5 +15,6 @@ app.get('/ping', (_req: Request, res: Response) => {
 app.use('/api/diaries', diaryRouter);
 
 app.use(middleware.unknownEndpoint);
+app.use(middleware.errorHandler);
 
 export default app;

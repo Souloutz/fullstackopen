@@ -1,6 +1,5 @@
-import zod from 'zod';
 import diaries, { save } from '../../data/entries';
-import { DiaryEntry, NewDiaryEntry, NonSensitiveDiaryEntry, Visibility, Weather } from '../types';
+import { DiaryEntry, NewDiaryEntry, NonSensitiveDiaryEntry } from '../types';
 
 const getEntries = (): DiaryEntry[] => {
     return diaries;
@@ -31,21 +30,9 @@ const addDiary = (entry: NewDiaryEntry): DiaryEntry => {
     return newDiaryEntry;
 };
 
-const newEntrySchema = zod.object({
-    weather: zod.nativeEnum(Weather),
-    visibility: zod.nativeEnum(Visibility),
-    date: zod.string().date(),
-    comment: zod.string().optional()
-});
-
-const toNewDiaryEntry = (object: unknown): NewDiaryEntry => {
-    return newEntrySchema.parse(object);
-};
-
 export default {
     getEntries,
     addDiary,
     getNonSensitiveEntries,
-    findById,
-    toNewDiaryEntry
+    findById
 };

@@ -1,3 +1,6 @@
+import zod from 'zod';
+import newEntrySchema from './utils/utility';
+
 export enum Weather {
     Sunny = 'sunny',
     Rainy = 'rainy',
@@ -13,14 +16,6 @@ export enum Visibility {
     Poor = 'poor'
 };
 
-const isWeather = (value: string): value is Weather => {
-    return Object.values(Weather).map(v => v.toString()).includes(value);
-};
-
-const isVisibility = (value: string): value is Visibility => {
-    return Object.values(Visibility).map(v => v.toString()).includes(value);
-};
-
 export interface DiaryEntry {
     id: number;
     date: string;
@@ -29,10 +24,5 @@ export interface DiaryEntry {
     comment?: string;
 }
 
+export type NewDiaryEntry = zod.infer<typeof newEntrySchema>;
 export type NonSensitiveDiaryEntry = Omit<DiaryEntry, 'comment'>;
-export type NewDiaryEntry = Omit<DiaryEntry, 'id'>;
-
-export default {
-    isWeather,
-    isVisibility
-};
